@@ -6,7 +6,7 @@ import os
 from sqlmodel import select
 
 # Import models FIRST to register with SQLModel
-from app.models import Pokemon
+from app.models import Workout
 from app.database import create_db_and_tables, get_cli_session, drop_all
 from app.auth import encrypt_password
 from tabulate import tabulate
@@ -15,7 +15,7 @@ cli = typer.Typer()
 
 @cli.command()
 def initialize():
-    """Initialize the database with Pokemon data from pokemon.csv"""
+    """Initialize the database with Workout data from Gym.csv"""
     typer.echo("Creating database tables...")
     
     # Drop existing tables and recreate them
@@ -24,8 +24,8 @@ def initialize():
     
     typer.echo("Loading Workout data from CSV...")
     
-    # Read and parse pokemon.csv
-    csv_file_path = "pokemon.csv"
+    # Read and parse Gym.csv
+    csv_file_path = "Gym.csv"
     
     with open(csv_file_path, mode='r', encoding='utf-8') as file:
         csv_reader = csv.DictReader(file)
@@ -33,50 +33,42 @@ def initialize():
         with get_cli_session() as db:
             for row in csv_reader:
                 try:
-                    # Handle empty type2 field
-                    type2 = row.get('type2', '')
-                    if not type2 or type2.strip() == '':
-                        type2 = None
-                    
-                    # Handle empty height/weight fields
-                    height = row.get('height_m')
-                    if height and height.strip():
+                    # Handle empty rating field
+                    rating = row.get('Rating', '')
+                    if rating and rating.strip():
                         try:
-                            height = float(height)
+                            rating = float(rating)
                         except ValueError:
-                            height = None
+                            rating = None
                     else:
-                        height = None
+                        rating = None
                     
-                    weight = row.get('weight_kg')
-                    if weight and weight.strip():
-                        try:
-                            weight = float(weight)
-                        except ValueError:
-                            weight = None
-                    else:
-                        weight = None
+                    # Handle empty rating description field
+                    rating_desc = row.get('RatingDesc', '')
+                    if not rating_desc or rating_desc.strip() == '':
+                        rating_desc = None
                     
-                    # Create Pokemon object
-                    pokemon = Pokemon(
-                        pokemon_id=int(row['pokedex_number']),
-                        name=row['name'],
-                        attack=int(row['attack']),
-                        defense=int(row['defense']),
-                        sp_attack=int(row['sp_attack']),
-                        sp_defense=int(row['sp_defense']),
-                        speed=int(row['speed']),
-                        hp=int(row['hp']),
-                        height=height,
-                        weight=weight,
-                        type1=row['type1'],
-                        type2=type2
+                    # Handle empty description field
+                    description = row.get('Desc', '')
+                    if not description or description.strip() == '':
+                        description = None
+                    
+                    # Create Workout object
+                    workout = Workout(
+                        title=row['Title'],
+                        description=description,
+                        type=row['Type'],
+                        body_part=row['BodyPart'],
+                        equipment=row['Equipment'],
+                        level=row['Level'],
+                        rating=rating,
+                        rating_desc=rating_desc
                     )
                     
-                    db.add(pokemon)
+                    db.add(workout)
                     
                 except (ValueError, KeyError) as e:
-                    typer.echo(f"Error processing row for {row.get('name', 'Unknown')}: {e}")
+                    typer.echo(f"Error processing row for {row.get('Title', 'Unknown')}: {e}")
                     continue
             
             db.commit()
