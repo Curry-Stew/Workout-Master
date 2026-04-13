@@ -3,61 +3,268 @@
 {% block internal_css %}
 
 <style>
+    @import url("https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700;900&family=Russo+One&display=swap");
+
+    :root {
+        --wm-bg-1: #061427;
+        --wm-bg-2: #0b2748;
+        --wm-panel: rgba(10, 27, 50, 0.82);
+        --wm-panel-soft: rgba(255, 255, 255, 0.95);
+        --wm-text-soft: #b8d4f0;
+        --wm-line: rgba(151, 193, 231, 0.28);
+        --wm-accent: #2f87f6;
+        --wm-accent-2: #0d4ea8;
+    }
+
     body {
         overflow-x: hidden;
-        background-color: #f8f9fa;
+        overflow-y: hidden;
+        margin: 0;
+        font-family: "Exo 2", sans-serif;
+        background:
+            radial-gradient(1000px 520px at 8% 3%, rgba(38, 98, 170, 0.28), transparent 58%),
+            radial-gradient(720px 420px at 90% 88%, rgba(43, 126, 211, 0.2), transparent 55%),
+            linear-gradient(130deg, var(--wm-bg-1) 0%, var(--wm-bg-2) 54%, #13345c 100%);
+        color: #f4fbff;
+        padding: 14px;
+    }
+
+    .app-shell {
+        min-height: calc(100vh - 28px);
+        height: calc(100vh - 28px);
+        border: 1px solid var(--wm-line);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 22px 48px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(130deg, rgba(7, 22, 42, 0.7), rgba(11, 33, 60, 0.6));
     }
 
     #wrapper {
         display: flex;
+        min-height: 100%;
+        height: 100%;
     }
 
     #sidebar {
-        min-width: 250px;
-        max-width: 250px;
-        min-height: 100vh;
+        min-width: 262px;
+        max-width: 262px;
+        min-height: 100%;
+        height: 100%;
         transition: all 0.3s;
-        background: #1b263b;
+        background: linear-gradient(180deg, rgba(9, 24, 46, 0.95), rgba(8, 22, 41, 0.93));
         color: #fff;
+        border-right: 1px solid var(--wm-line);
+        box-shadow: 12px 0 30px rgba(0, 0, 0, 0.22);
     }
 
     #sidebar.collapsed {
-        margin-left: -250px;
+        margin-left: -262px;
+    }
+
+    #sidebar h4 {
+        font-family: "Russo One", sans-serif;
+        letter-spacing: 0.04em;
+        font-size: 1.15rem;
+        text-transform: uppercase;
+        color: #ffffff;
     }
 
     #sidebar .nav-link {
-        color: #adb5bd;
-        font-weight: 500;
+        color: #a8c5e0;
+        font-weight: 700;
+        border-radius: 10px;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        font-size: 0.78rem;
     }
 
     #sidebar .nav-link:hover,
     #sidebar .nav-link.active {
         color: #fff;
-        background-color: #415a77;
-        border-radius: 0.5rem;
+        background: linear-gradient(120deg, rgba(13, 78, 168, 0.9), rgba(47, 135, 246, 0.86));
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(47, 135, 246, 0.28);
+    }
+
+    #sidebar .nav-link.text-danger {
+        color: #ff9fa6 !important;
+    }
+
+    #sidebar .nav-link.text-danger:hover {
+        background: rgba(195, 45, 67, 0.25);
+    }
+
+    #sidebar .nav {
+        margin-bottom: 0;
     }
 
     #content {
         width: 100%;
-        padding: 1rem;
+        padding: 1rem 1rem 1.5rem;
         transition: all 0.3s;
         display: flex;
         flex-direction: column;
-        background-color: #f8f9fa;
+        background: transparent;
+        min-height: 100%;
+        height: 100%;
+        overflow-y: auto;
     }
 
     .card {
-        border: none;
-        border-radius: 1rem;
+        border: 1px solid var(--wm-line);
+        border-radius: 14px;
+        background: var(--wm-panel-soft);
+        color: #0f223d;
+        box-shadow: 0 16px 28px rgba(0, 0, 0, 0.12);
     }
 
-    .summary-card {
-        border-left: 5px solid #0d6efd;
+    .table-responsive {
+        border: 1px solid var(--wm-line);
+        border-radius: 14px !important;
+        background: var(--wm-panel-soft) !important;
+    }
+
+    .table {
+        color: #193354;
+    }
+
+    .table thead th {
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-size: 0.73rem;
+        color: #5a7799;
+    }
+
+    .list-group-item {
+        border: 1px solid rgba(138, 179, 216, 0.35);
+        border-radius: 10px !important;
+        margin-bottom: 8px;
     }
 
     .navbar {
-        border-bottom: 1px solid #dee2e6;
+        border: 1px solid var(--wm-line);
+        background: linear-gradient(130deg, rgba(9, 26, 50, 0.82), rgba(12, 33, 60, 0.75)) !important;
+        backdrop-filter: blur(8px);
     }
+
+    .navbar .fw-semibold {
+        color: #e7f3ff;
+    }
+
+    .btn-primary {
+        border: none;
+        background: linear-gradient(125deg, var(--wm-accent-2), var(--wm-accent));
+        font-weight: 700;
+        border-radius: 10px;
+    }
+
+    .btn-outline-primary,
+    .btn-outline-secondary,
+    .btn-outline-danger,
+    .btn-outline-success {
+        border-radius: 10px;
+        font-weight: 700;
+    }
+
+    #menu-toggle {
+        border: 1px solid rgba(143, 194, 247, 0.72);
+        background: linear-gradient(120deg, rgba(17, 67, 126, 0.95), rgba(38, 124, 215, 0.92));
+        color: #eef7ff;
+        font-weight: 800;
+        letter-spacing: 0.03em;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(29, 108, 196, 0.35);
+        min-width: 52px;
+    }
+
+    #menu-toggle:hover {
+        background: linear-gradient(120deg, rgba(27, 86, 156, 1), rgba(55, 142, 236, 0.96));
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    #menu-toggle:focus {
+        box-shadow: 0 0 0 0.2rem rgba(78, 155, 245, 0.35);
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #29476c;
+        font-size: 0.84rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        border-color: #bfd3e8;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #4c93ef;
+        box-shadow: 0 0 0 0.2rem rgba(57, 133, 231, 0.2);
+    }
+
+    .page-headline {
+        background: linear-gradient(90deg, #f4fbff 0%, #cde5ff 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-family: "Russo One", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-bottom: 0.35rem;
+    }
+
+    .page-subtitle {
+        color: var(--wm-text-soft);
+        margin-bottom: 0;
+    }
+
+    .wm-hero {
+        border: 1px solid var(--wm-line);
+        border-radius: 14px;
+        padding: 1rem 1.15rem;
+        background:
+            radial-gradient(360px 200px at 0% 0%, rgba(46, 129, 229, 0.22), transparent 70%),
+            linear-gradient(120deg, rgba(13, 37, 67, 0.72), rgba(9, 30, 55, 0.64));
+        margin-bottom: 1rem;
+    }
+
+    .wm-hero h1,
+    .wm-hero h2 {
+        margin: 0;
+    }
+
+    .wm-pills {
+        margin-top: 0.7rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .wm-pill {
+        display: inline-block;
+        border: 1px solid rgba(173, 209, 242, 0.36);
+        color: #d7ebff;
+        border-radius: 999px;
+        padding: 0.2rem 0.62rem;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+        background: rgba(18, 57, 98, 0.56);
+        text-decoration: none;
+    }
+
+    a.wm-pill:hover {
+        color: #ffffff;
+        border-color: rgba(193, 223, 251, 0.7);
+        background: rgba(39, 93, 152, 0.7);
+    }
+
 </style>
 
 {% block additional_styles %}{% endblock %}
@@ -66,47 +273,42 @@
 
 
 {% block content %}
+<div class="app-shell">
 <div id="wrapper">
 
-    <nav id="sidebar" class="p-3 d-flex flex-column vh-100">
+    <nav id="sidebar" class="px-3 pt-3 pb-0 d-flex flex-column h-100">
         <h4 class="text-white mb-4 text-center py-4">Workout Master</h4>
 
         <ul class="nav nav-pills flex-column gap-2 flex-grow-1">
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center {{ 'active' if request.path == '/app' }}" href="/app">
-                    <span class="material-symbols-outlined me-2">dashboard</span>
                     Home
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center {{ 'active' if request.path.startswith('/workouts') }}" href="/workouts">
-                    <span class="material-symbols-outlined me-2">fitness_center</span>
                     Workouts
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center {{ 'active' if request.path.startswith('/routines') }}" href="/routines">
-                    <span class="material-symbols-outlined me-2">playlist_add_check</span>
                     Routines
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center {{ 'active' if request.path.startswith('/assistant') }}" href="/assistant">
-                    <span class="material-symbols-outlined me-2">smart_toy</span>
                     AI Assistant
                 </a>
             </li>
             {% if user.role == 'admin' %}
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center {{ 'active' if request.path.startswith('/admin') }}" href="/admin">
-                    <span class="material-symbols-outlined me-2">admin_panel_settings</span>
                     Admin Dashboard
                 </a>
             </li>
             {% endif %}
             <li class="nav-item mt-auto">
                 <a class="nav-link d-flex align-items-center text-danger" href="/logout">
-                    <span class="material-symbols-outlined me-2">logout</span>
                     Logout
                 </a>
             </li>
@@ -115,7 +317,7 @@
 
     <div id="content">
         <nav class="navbar navbar-expand-lg bg-white mb-4 px-3 rounded-3 shadow-sm">
-            <button class="btn btn-outline-secondary" id="menu-toggle">
+            <button class="btn" id="menu-toggle" type="button" aria-label="Toggle sidebar menu">
                 <span class="material-symbols-outlined md-dark">menu</span>
             </button>
 
@@ -138,6 +340,7 @@
     </div>
 
 
+</div>
 </div>
 
 
