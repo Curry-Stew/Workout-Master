@@ -86,7 +86,8 @@ def initialize():
                         equipment=row['Equipment'],
                         level=row['Level'],
                         rating=rating,
-                        rating_desc=rating_desc
+                        rating_desc=rating_desc,
+                        image_link=row['ImageLink']
                     )
                     
                     db.add(workout)
