@@ -17,8 +17,8 @@ class Settings(BaseSettings):
     db_additional_overflow:int=10
     db_pool_timeout:int=10
     db_pool_recycle:int=10
-    ollama_base_url: str = "http://localhost:11434"
-    ollama_model_name: str = "llama3.2:3b"
-    ollama_temperature: float = 0.7
+    gemini_api_key: str = ""
+    gemini_model_name: str = "gemini-3-flash-preview"
+    gemini_temperature: float = 0.4
     
     model_config = SettingsConfigDict(env_file=".env")
