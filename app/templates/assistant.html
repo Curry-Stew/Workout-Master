@@ -1,0 +1,98 @@
+{% extends "authenticated-base.html" %}
+
+{% block title %}AI Assistant{% endblock %}
+
+{% block subpage_content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Workout AI Assistant</h2>
+            <p class="text-muted mb-0">Ask for routine ideas, workout suggestions, and adjustments for your goals.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="chat-log" class="border rounded-3 p-3 mb-3 bg-light" style="height: 420px; overflow-y: auto;"></div>
+
+                    <form id="assistant-chat-form" class="d-flex gap-2">
+                        <input
+                            id="assistant-message"
+                            type="text"
+                            class="form-control"
+                            placeholder="Ask something like: Build me a beginner leg day routine"
+                            maxlength="4000"
+                            required
+                        >
+                        <button class="btn btn-primary" type="submit">Send</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block subpage_scripts %}
+<script>
+    const chatLog = document.getElementById("chat-log");
+    const form = document.getElementById("assistant-chat-form");
+    const messageInput = document.getElementById("assistant-message");
+
+    function addMessage(author, text, type) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "mb-3";
+
+        const bubble = document.createElement("div");
+        bubble.className = type === "assistant"
+            ? "p-3 rounded-3 bg-white border"
+            : "p-3 rounded-3 text-white";
+        if (type !== "assistant") {
+            bubble.style.backgroundColor = "#1b263b";
+        }
+
+        const title = document.createElement("div");
+        title.className = "small text-muted mb-1";
+        title.textContent = author;
+
+        const content = document.createElement("div");
+        content.textContent = text;
+
+        wrapper.appendChild(title);
+        wrapper.appendChild(bubble);
+        bubble.appendChild(content);
+        chatLog.appendChild(wrapper);
+        chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const message = messageInput.value.trim();
+        if (!message) {
+            return;
+        }
+
+        addMessage("You", message, "user");
+        messageInput.value = "";
+
+        try {
+            const response = await fetch("/api/assistant/chat", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({message}),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Request failed with ${response.status}`);
+            }
+
+            const data = await response.json();
+            addMessage("Assistant", data.response || "No response received.", "assistant");
+        } catch (error) {
+            addMessage("Assistant", "I could not reach the assistant service right now.", "assistant");
+        }
+    });
+</script>
+{% endblock %}
