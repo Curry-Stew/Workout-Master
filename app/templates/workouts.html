@@ -2,13 +2,34 @@
 
 {% block title %}Browse Workouts{% endblock %}
 
+{% block additional_styles %}
+<style>
+    .workouts-table-scroll {
+        max-height: 58vh;
+        overflow-y: auto;
+        padding: 0 !important;
+    }
+
+    .workouts-table-scroll thead th {
+        position: sticky;
+        top: 0;
+        background: #eef4fb;
+        z-index: 1;
+    }
+
+    .workouts-table-scroll table {
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}
+
 {% block subpage_content %}
 <div class="container">
-    <div class="row mb-4">
-        <div class="col-12 d-flex justify-content-between align-items-center">
+    <div class="wm-hero">
+        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
             <div>
-                <h2>Workout Library</h2>
-                <p class="text-muted mb-0">Browse all workouts and add them to your routines.</p>
+                <h2 class="page-headline">Workout Library</h2>
+                <p class="page-subtitle">Browse all workouts and add them to your routines.</p>
             </div>
             <a href="/routines" class="btn btn-outline-primary">My routines</a>
         </div>
@@ -64,7 +85,7 @@
 
     <div class="row">
         <div class="col-12">
-            <div class="table-responsive shadow-sm rounded-3 bg-white p-3">
+            <div class="table-responsive workouts-table-scroll shadow-sm rounded-3 bg-white">
                 <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
