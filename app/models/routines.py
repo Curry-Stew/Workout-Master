@@ -16,6 +16,9 @@ class RoutineWorkoutBase(SQLModel):
     routine_id: int = Field(foreign_key="routine.id")
     workout_id: int = Field(foreign_key="workout.id")
     order: int = Field(default=0)
+    sets: int = Field(default=3, ge=1)
+    reps: str = Field(default="10")
+    note: Optional[str] = Field(default=None, nullable=True)
 
 
 class RoutineWorkout(RoutineWorkoutBase, table=True):
