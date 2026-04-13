@@ -6,12 +6,19 @@ import os
 from sqlmodel import select
 
 # Import models FIRST to register with SQLModel
-from app.models import Workout
+from app.models import *
 from app.database import create_db_and_tables, get_cli_session, drop_all
-#from app.auth import encrypt_password
 from tabulate import tabulate
 
+from app.models.user import UserBase
+from app.utilities.security import encrypt_password
+
 cli = typer.Typer()
+
+@cli.callback()
+def main() -> None:
+    """Workout Master CLI."""
+    return None
 
 @cli.command()
 def initialize():
@@ -31,6 +38,12 @@ def initialize():
         csv_reader = csv.DictReader(file)
         
         with get_cli_session() as db:
+            bob = UserBase(username='bob', email='bob@mail.com', password=encrypt_password("bobpass"), role='admin')
+            bob_db = User.model_validate(bob)
+
+            db.add(bob_db)
+            db.commit()      
+
             for row in csv_reader:
                 try:
                     # Handle empty rating field
