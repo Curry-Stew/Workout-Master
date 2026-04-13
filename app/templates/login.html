@@ -1,101 +1,115 @@
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
 
-{% block external_js %}
-
-{% endblock %}
-
-
 {% block internal_css %}
 <style>
+    @import url("https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700;900&family=Russo+One&display=swap");
+
     body {
-        background-color: #f8f9fa;
-    }
-
-    .login-container {
+        margin: 0;
         min-height: 100vh;
-    }
-
-    .login-card {
-        border: none;
-        border-radius: 1rem;
-        overflow: hidden;
-    }
-
-    .login-image {
-        background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+        font-family: "Exo 2", sans-serif;
+        background:
+            radial-gradient(900px 520px at 8% 4%, rgba(42, 102, 178, 0.3), transparent 58%),
+            linear-gradient(130deg, #051427 0%, #0b2748 55%, #12365f 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        padding: 3rem;
+        padding: 24px;
     }
 
-    .form-section {
-        padding: 3rem;
+    .auth-shell {
+        width: min(540px, 94vw);
     }
 
-    .btn-primary {
-        border-radius: 0.5rem;
+    .brand {
+        font-family: "Russo One", sans-serif;
+        font-size: clamp(2rem, 4vw, 2.6rem);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: #eef7ff;
+        margin-bottom: 0.35rem;
+    }
+
+    .subtitle {
+        color: #bdd7ef;
+        margin-bottom: 1.1rem;
+    }
+
+    .form-card {
+        background: rgba(255, 255, 255, 0.94);
+        border-radius: 14px;
+        color: #0c1b2f;
+        padding: 18px;
+    }
+
+    .form-title {
+        font-family: "Russo One", sans-serif;
+        font-size: 1.55rem;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+    }
+
+    .form-label {
+        font-weight: 700;
+        font-size: 0.82rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
     }
 
     .form-control {
-        border-radius: 0.5rem;
+        border-radius: 10px;
+        min-height: 42px;
+        border: 1px solid #c2d5ec;
+    }
+
+    .btn-main {
+        border: none;
+        border-radius: 10px;
+        min-height: 44px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: linear-gradient(125deg, #0c50a8, #2f87f6);
+    }
+
+    .btn-alt {
+        border-radius: 10px;
+        min-height: 42px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 </style>
 {% endblock %}
 
-
 {% block content %}
+<div class="auth-shell">
+    <div class="brand">Workout Master</div>
+    <p class="subtitle">Sign in to continue to your routines, workout library, and assistant.</p>
 
-<div class="container login-container d-flex align-items-center justify-content-center">
-    <div class="card shadow-lg login-card col-lg-10">
-        <div class="row g-0">
-            <div class="col-lg-6 d-none d-lg-flex login-image">
-                <div class="text-center">
-                    <h2 class="mt-4 fw-bold">Welcome Back</h2>
-                    <p class="lead">Sign in to continue to the app</p>
-                </div>
+    <div class="form-card">
+        <h2 class="form-title">Sign In</h2>
+        <form id="loginForm" method="POST" class="mb-3">
+            <div class="mb-2">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
             </div>
-            <div class="col-lg-6 bg-white">
-                <div class="form-section">
-                    <h3 class="fw-bold mb-4">Login</h3>
-
-                    <form id="loginForm" method="POST">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control form-control-md" id="username" name="username"
-                                required="required">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control form-control-md" id="password" name="password"
-                                required>
-                        </div>
-
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                Sign In
-                            </button>
-
-                    </form>
-                </div>
-
-                <div class="d-grid mb-3">
-                    <a class="btn btn-secondary btn-lg" href="{{url_for('register_view')}}" role="button">
-                        Sign Up
-                    </a>
-                </div>
-
-
-                {% for message in get_flashed_messages(request) %}
-                <div class="alert alert-{{ message.type }}" role="alert">{{ message.message }}</div>
-                {% endfor %}
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
             </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-main text-white">Log In</button>
+            </div>
+        </form>
+        <div class="d-grid">
+            <a class="btn btn-outline-dark btn-alt" href="{{ url_for('register_view') }}">Create Account</a>
         </div>
 
+        {% for message in get_flashed_messages(request) %}
+        <div class="alert alert-{{ message.type }} mt-3 mb-0" role="alert">{{ message.message }}</div>
+        {% endfor %}
     </div>
-</div>
 </div>
 {% endblock %}
