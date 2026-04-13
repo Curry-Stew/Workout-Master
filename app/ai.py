@@ -1,7 +1,6 @@
 from typing import Dict, List
 
 from google import genai
-from google.genai import types
 from sqlalchemy import or_
 from sqlmodel import Session, select
 
@@ -121,7 +120,6 @@ def generate_assistant_response(message: str, user: User, db: Session) -> Dict[s
         response = client.models.generate_content(
             model=settings.gemini_model_name,
             contents=prompt,
-            config=types.GenerateContentConfig(temperature=settings.gemini_temperature),
         )
     except Exception as exc:
         return {
