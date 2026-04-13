@@ -1,130 +1,135 @@
-from typing import Dict
+from typing import Dict, List
 
+from google import genai
+from google.genai import types
+from sqlalchemy import or_
 from sqlmodel import Session, select
 
 from app.config import get_settings
 from app.models import Routine, RoutineWorkout, User, Workout
 
-try:
-    from langchain.agents import create_agent
-    from langchain.tools import tool
-    from langchain_ollama import ChatOllama
-except ImportError:
-    create_agent = None
-    tool = None
-    ChatOllama = None
+def _list_my_routines(db: Session, user_id: int) -> str:
+    routines = db.exec(select(Routine).where(Routine.user_id == user_id)).all()
+    if not routines:
+        return "No routines found for this user."
 
-
-def _build_tools(db: Session, user_id: int):
-    if tool is None:
-        return []
-
-    @tool
-    def list_my_routines() -> str:
-        """List all routines that belong to the current user."""
-        routines = db.exec(select(Routine).where(Routine.user_id == user_id)).all()
-        if not routines:
-            return "No routines found for this user."
-
-        rows = [f"- {routine.id}: {routine.name}" for routine in routines]
-        return "\n".join(rows)
-
-    @tool
-    def get_routine_details(routine_name: str) -> str:
-        """Get workouts inside one of the current user's routines by routine name."""
-        target = routine_name.strip().lower()
-        routines = db.exec(select(Routine).where(Routine.user_id == user_id)).all()
-        selected = next((routine for routine in routines if routine.name.lower() == target), None)
-        if selected is None:
-            return "Routine not found for current user."
-
-        rows = db.exec(
-            select(RoutineWorkout, Workout)
-            .join(Workout, Workout.id == RoutineWorkout.workout_id)
-            .where(RoutineWorkout.routine_id == selected.id)
-            .order_by(RoutineWorkout.order)
+    rows = []
+    for routine in routines:
+        workout_count = db.exec(
+            select(RoutineWorkout).where(RoutineWorkout.routine_id == routine.id)
         ).all()
-
-        if not rows:
-            return f"Routine '{selected.name}' has no workouts yet."
-
-        lines = [f"Routine: {selected.name}"]
-        for association, workout in rows:
-            lines.append(f"{association.order}. {workout.title} ({workout.body_part}, {workout.level})")
-        return "\n".join(lines)
-
-    @tool
-    def suggest_workouts(body_part: str = "", level: str = "", workout_type: str = "") -> str:
-        """Suggest workouts filtered by body part, level, and type."""
-        query = select(Workout)
-        if body_part.strip():
-            query = query.where(Workout.body_part.ilike(body_part.strip()))
-        if level.strip():
-            query = query.where(Workout.level.ilike(level.strip()))
-        if workout_type.strip():
-            query = query.where(Workout.type.ilike(workout_type.strip()))
-
-        workouts = db.exec(query.limit(20)).all()
-        if not workouts:
-            return "No workouts matched those filters."
-
-        rows = [
-            f"- {workout.title} | type: {workout.type} | body_part: {workout.body_part} | level: {workout.level}"
-            for workout in workouts
-        ]
-        return "\n".join(rows)
-
-    return [list_my_routines, get_routine_details, suggest_workouts]
+        rows.append(
+            f"- {routine.name}: {len(workout_count)} workouts. Notes: {routine.description or 'None'}"
+        )
+    return "\n".join(rows)
 
 
-def _extract_assistant_message(result: Dict[str, Any]) -> str:
-    messages = result.get("messages") if isinstance(result, dict) else None
-    if isinstance(messages, list):
-        for message in reversed(messages):
-            content = getattr(message, "content", None)
-            if content:
-                return str(content)
-            if isinstance(message, dict) and message.get("content"):
-                return str(message["content"])
-    return "I could not generate a response right now."
+def _get_routine_details(db: Session, user_id: int, message: str) -> str:
+    routines = db.exec(select(Routine).where(Routine.user_id == user_id)).all()
+    matched = None
+    lowered_message = message.lower()
+    for routine in routines:
+        if routine.name.lower() in lowered_message:
+            matched = routine
+            break
+
+    if matched is None:
+        return "No specific routine referenced in the user request."
+
+    rows = db.exec(
+        select(RoutineWorkout, Workout)
+        .join(Workout, Workout.id == RoutineWorkout.workout_id)
+        .where(RoutineWorkout.routine_id == matched.id)
+        .order_by(RoutineWorkout.order)
+    ).all()
+
+    if not rows:
+        return f"Routine '{matched.name}' exists but has no workouts yet."
+
+    lines = [f"Routine details for {matched.name}:"]
+    for association, workout in rows:
+        lines.append(
+            f"{association.order}. {workout.title} | body part: {workout.body_part} | type: {workout.type} | "
+            f"level: {workout.level} | sets: {association.sets} | reps: {association.reps} | note: {association.note or 'None'}"
+        )
+    return "\n".join(lines)
+
+
+def _search_workouts(db: Session, message: str) -> str:
+    tokens = [token.strip(" ,.!?;:").lower() for token in message.split() if len(token.strip(" ,.!?;:")) >= 3]
+    if not tokens:
+        workouts = db.exec(select(Workout).limit(12)).all()
+    else:
+        clauses = []
+        for token in tokens[:8]:
+            pattern = f"%{token}%"
+            clauses.extend([
+                Workout.title.ilike(pattern),
+                Workout.description.ilike(pattern),
+                Workout.type.ilike(pattern),
+                Workout.body_part.ilike(pattern),
+                Workout.equipment.ilike(pattern),
+                Workout.level.ilike(pattern),
+            ])
+        workouts = db.exec(select(Workout).where(or_(*clauses)).limit(20)).all()
+
+    if not workouts:
+        return "No workouts matched the request terms."
+
+    rows = []
+    for workout in workouts:
+        rows.append(
+            f"- {workout.title} | type: {workout.type} | body part: {workout.body_part} | "
+            f"equipment: {workout.equipment} | level: {workout.level} | description: {workout.description or 'None'}"
+        )
+    return "\n".join(rows)
+
+
+def _build_prompt(message: str, user: User, db: Session) -> str:
+    routines_context = _list_my_routines(db, user.id)
+    routine_details_context = _get_routine_details(db, user.id, message)
+    workout_context = _search_workouts(db, message)
+
+    return (
+        "You are Workout Master Assistant. Use the provided database context to help the user build routines, "
+        "adjust sets and reps, and explain workouts accurately. Only use workouts from the provided context when "
+        "making specific routine recommendations. If the context is insufficient, say so clearly. Keep responses concise and practical.\n\n"
+        f"Current user: {user.username}\n\n"
+        "User routines:\n"
+        f"{routines_context}\n\n"
+        "Referenced routine details:\n"
+        f"{routine_details_context}\n\n"
+        "Relevant workout library matches:\n"
+        f"{workout_context}\n\n"
+        "User request:\n"
+        f"{message}"
+    )
 
 
 def generate_assistant_response(message: str, user: User, db: Session) -> Dict[str, str]:
     settings = get_settings()
-    if create_agent is None or tool is None or ChatOllama is None:
+    if not settings.gemini_api_key:
         return {
-            "response": "LangChain/Ollama dependencies are missing. Install langchain and langchain-ollama.",
-            "model_used": settings.ollama_model_name,
+            "response": "Gemini is not configured yet. Add GEMINI_API_KEY to your .env file.",
+            "model_used": settings.gemini_model_name,
         }
 
-    model = ChatOllama(
-        model=settings.ollama_model_name,
-        temperature=settings.ollama_temperature,
-        base_url=settings.ollama_base_url,
-    )
-
-    assistant = create_agent(
-        model=model,
-        tools=_build_tools(db, user.id),
-        system_prompt=(
-            "You are Workout Master Assistant. Help users plan and improve workouts. "
-            "Prefer using tools when users ask about their routines or workout suggestions. "
-            "Keep responses practical and concise."
-        ),
-    )
+    prompt = _build_prompt(message, user, db)
 
     try:
-        result = assistant.invoke(
-            {"messages": [{"role": "user", "content": message}]},
-            config={"configurable": {"thread_id": f"user-{user.id}"}},
+        client = genai.Client(api_key=settings.gemini_api_key)
+        response = client.models.generate_content(
+            model=settings.gemini_model_name,
+            contents=prompt,
+            config=types.GenerateContentConfig(temperature=settings.gemini_temperature),
         )
     except Exception as exc:
         return {
-            "response": f"I could not reach Ollama at {settings.ollama_base_url}. Error: {exc}",
-            "model_used": settings.ollama_model_name,
+            "response": f"I could not reach Gemini right now. Error: {exc}",
+            "model_used": settings.gemini_model_name,
         }
 
     return {
-        "response": _extract_assistant_message(result),
-        "model_used": settings.ollama_model_name,
+        "response": getattr(response, "text", None) or "I could not generate a response right now.",
+        "model_used": settings.gemini_model_name,
     }
