@@ -56,6 +56,9 @@
                                         <option value="{{ routine.id }}">{{ routine.name }}</option>
                                         {% endfor %}
                                     </select>
+                                    <input class="form-control form-control-sm" style="max-width: 80px;" type="number" min="1" name="sets" value="3" required title="Sets">
+                                    <input class="form-control form-control-sm" style="max-width: 100px;" type="text" name="reps" value="10" required title="Reps">
+                                    <input class="form-control form-control-sm" style="max-width: 160px;" type="text" name="note" placeholder="Note" title="Note">
                                     <button class="btn btn-sm btn-primary" type="submit">Add</button>
                                 </form>
                                 {% else %}
