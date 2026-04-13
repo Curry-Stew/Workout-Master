@@ -46,6 +46,34 @@ async def create_routine(
     )
 
 
+@router.post("/routines/{routine_id}/delete")
+async def delete_routine(
+    request: Request,
+    routine_id: int,
+    user: AuthDep,
+    db: SessionDep,
+):
+    routine = db.get(Routine, routine_id)
+    if not routine:
+        flash(request, "Routine not found.", "danger")
+        return RedirectResponse(url=request.url_for("routines_view"), status_code=status.HTTP_303_SEE_OTHER)
+
+    if routine.user_id != user.id:
+        flash(request, "You are not allowed to delete this routine.", "danger")
+        return RedirectResponse(url=request.url_for("routines_view"), status_code=status.HTTP_303_SEE_OTHER)
+
+    associations = db.exec(select(RoutineWorkout).where(RoutineWorkout.routine_id == routine.id)).all()
+    for association in associations:
+        db.delete(association)
+
+    routine_name = routine.name
+    db.delete(routine)
+    db.commit()
+
+    flash(request, f"Routine '{routine_name}' deleted.")
+    return RedirectResponse(url=request.url_for("routines_view"), status_code=status.HTTP_303_SEE_OTHER)
+
+
 @router.post("/routines/add")
 async def add_workout_to_routine(
     request: Request,
@@ -53,6 +81,9 @@ async def add_workout_to_routine(
     db: SessionDep,
     workout_id: int = Form(...),
     routine_id: int = Form(...),
+    sets: int = Form(3),
+    reps: str = Form("10"),
+    note: str = Form(""),
 ):
     routine = db.get(Routine, routine_id)
     if not routine or routine.user_id != user.id:
@@ -78,11 +109,21 @@ async def add_workout_to_routine(
     ).first()
     max_order = max_order_row if isinstance(max_order_row, int) else (max_order_row[0] if max_order_row else 0)
     position = (max_order or 0) + 1
-    association = RoutineWorkout(routine_id=routine.id, workout_id=workout.id, order=position)
+    clean_sets = max(1, sets)
+    clean_reps = reps.strip() or "10"
+    clean_note = note.strip() or None
+    association = RoutineWorkout(
+        routine_id=routine.id,
+        workout_id=workout.id,
+        order=position,
+        sets=clean_sets,
+        reps=clean_reps,
+        note=clean_note,
+    )
     db.add(association)
     db.commit()
 
-    flash(request, f"Added {workout.title} to {routine.name}.")
+    flash(request, f"Added {workout.title} to {routine.name} with {clean_sets} sets of {clean_reps}.")
     return RedirectResponse(request.url_for("routine_detail_view", routine_id=routine.id), status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -182,4 +223,33 @@ async def remix_workout(
     db.commit()
 
     flash(request, f"Replaced a workout in {routine.name} with {replacement.title}.")
+    return RedirectResponse(request.url_for("routine_detail_view", routine_id=routine.id), status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post("/routines/{routine_id}/update-plan")
+async def update_routine_workout_plan(
+    request: Request,
+    routine_id: int,
+    user: AuthDep,
+    db: SessionDep,
+    association_id: int = Form(...),
+    sets: int = Form(3),
+    reps: str = Form("10"),
+    note: str = Form(""),
+):
+    routine = db.get(Routine, routine_id)
+    if not routine or routine.user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Routine not found")
+
+    association = db.get(RoutineWorkout, association_id)
+    if not association or association.routine_id != routine.id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workout association not found")
+
+    association.sets = max(1, sets)
+    association.reps = reps.strip() or "10"
+    association.note = note.strip() or None
+    db.add(association)
+    db.commit()
+
+    flash(request, "Routine item updated.")
     return RedirectResponse(request.url_for("routine_detail_view", routine_id=routine.id), status_code=status.HTTP_303_SEE_OTHER)
