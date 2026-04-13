@@ -4,22 +4,33 @@
 
 {% block internal_css %}
 <style>
+    @import url("https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700;900&family=Russo+One&display=swap");
+
     body {
-        background-color: #f8f9fa;
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Exo 2", sans-serif;
+        background: radial-gradient(circle at 18% 10%, #1f486f 0%, #0b1f3a 46%, #050f1f 100%);
     }
 
     .page-container {
         min-height: 100vh;
+        display: grid;
+        place-items: center;
     }
 
     .card-custom {
-        border: none;
+        border: 1px solid rgba(151, 193, 231, 0.35);
         border-radius: 1rem;
         overflow: hidden;
+        width: min(1080px, 95vw);
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
     }
 
     .left-section {
-        background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+        background:
+            linear-gradient(170deg, rgba(10, 31, 59, 0.88), rgba(9, 29, 56, 0.92)),
+            url("https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=80") center/cover;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -34,10 +45,20 @@
 
     .right-section {
         padding: 3rem;
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .left-section h2,
+    .right-section h3 {
+        font-family: "Russo One", sans-serif;
+        text-transform: uppercase;
     }
 
     .btn-primary {
+        border: none;
         border-radius: 0.5rem;
+        font-weight: 700;
+        background: linear-gradient(125deg, #0c50a8, #2f87f6);
     }
 </style>
 {% endblock %}
