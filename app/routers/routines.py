@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import Form, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlmodel import select
@@ -128,7 +130,15 @@ async def add_workout_to_routine(
 
 
 @router.get("/routines/{routine_id}", response_class=HTMLResponse)
-async def routine_detail_view(request: Request, routine_id: int, user: AuthDep, db: SessionDep):
+async def routine_detail_view(
+    request: Request,
+    routine_id: int,
+    user: AuthDep,
+    db: SessionDep,
+    workout_type: Optional[str] = None,
+    body_part: Optional[str] = None,
+    equipment: Optional[str] = None,
+):
     routine = db.get(Routine, routine_id)
     if not routine or routine.user_id != user.id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Routine not found")
@@ -144,7 +154,14 @@ async def routine_detail_view(request: Request, routine_id: int, user: AuthDep, 
     available_query = select(Workout)
     if existing_workout_ids:
         available_query = available_query.where(Workout.id.notin_(existing_workout_ids))
-    available_workouts = db.exec(available_query).all()
+    if workout_type:
+        available_query = available_query.where(Workout.type == workout_type)
+    if body_part:
+        available_query = available_query.where(Workout.body_part == body_part)
+    if equipment:
+        available_query = available_query.where(Workout.equipment == equipment)
+
+    available_workouts = db.exec(available_query.order_by(Workout.title)).all()
 
     alternative_workouts = {}
     for association, workout in routine_rows:
@@ -156,6 +173,10 @@ async def routine_detail_view(request: Request, routine_id: int, user: AuthDep, 
             alternative_query = alternative_query.where(Workout.id.notin_(existing_workout_ids))
         alternative_workouts[association.id] = db.exec(alternative_query).all()
 
+    types = [row[0] for row in db.exec(select(Workout.type).distinct().order_by(Workout.type)).all()]
+    body_parts = [row[0] for row in db.exec(select(Workout.body_part).distinct().order_by(Workout.body_part)).all()]
+    equipments = [row[0] for row in db.exec(select(Workout.equipment).distinct().order_by(Workout.equipment)).all()]
+
     return templates.TemplateResponse(
         request=request,
         name="routine_detail.html",
@@ -165,6 +186,12 @@ async def routine_detail_view(request: Request, routine_id: int, user: AuthDep, 
             "routine_rows": routine_rows,
             "available_workouts": available_workouts,
             "alternative_workouts": alternative_workouts,
+            "types": types,
+            "body_parts": body_parts,
+            "equipments": equipments,
+            "selected_workout_type": workout_type,
+            "selected_body_part": body_part,
+            "selected_equipment": equipment,
         },
     )
 

@@ -22,6 +22,41 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">Add workout to routine</h5>
+                    <form method="get" class="row g-2 mb-3">
+                        <div class="col-sm-6 col-md-4">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" name="workout_type">
+                                <option value="">All Types</option>
+                                {% for option in types %}
+                                <option value="{{ option }}" {% if selected_workout_type == option %}selected{% endif %}>{{ option|title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <label class="form-label">Body part</label>
+                            <select class="form-select" name="body_part">
+                                <option value="">All Body Parts</option>
+                                {% for option in body_parts %}
+                                <option value="{{ option }}" {% if selected_body_part == option %}selected{% endif %}>{{ option|title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <label class="form-label">Equipment</label>
+                            <select class="form-select" name="equipment">
+                                <option value="">All Equipment</option>
+                                {% for option in equipments %}
+                                <option value="{{ option }}" {% if selected_equipment == option %}selected{% endif %}>{{ option|title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-grid">
+                            <button type="submit" class="btn btn-outline-primary">Filter</button>
+                        </div>
+                        <div class="col-md-2 d-grid">
+                            <a href="{{ request.url_for('routine_detail_view', routine_id=routine.id) }}" class="btn btn-outline-secondary">Clear</a>
+                        </div>
+                    </form>
                     {% if available_workouts %}
                     <form method="post" action="/routines/add">
                         <input type="hidden" name="routine_id" value="{{ routine.id }}">
@@ -53,9 +88,15 @@
                         </div>
                     </form>
                     {% else %}
-                    <div class="alert alert-info mb-0">
-                        All workouts are already present in this routine. Browse the workout library to add new exercises to different routines.
-                    </div>
+                        {% if selected_workout_type or selected_body_part or selected_equipment %}
+                        <div class="alert alert-info mb-0">
+                            No available workouts match the selected filters. Clear or adjust the filters to see more options.
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info mb-0">
+                            All workouts are already present in this routine. Browse the workout library to add new exercises to different routines.
+                        </div>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>

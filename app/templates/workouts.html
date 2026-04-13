@@ -14,6 +14,44 @@
         </div>
     </div>
 
+    <div class="row mb-4">
+        <div class="col-12">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-sm-6 col-md-3">
+                    <label class="form-label">Type</label>
+                    <select class="form-select" name="workout_type">
+                        <option value="">All Types</option>
+                        {% for option in types %}
+                        <option value="{{ option }}" {% if selected_workout_type == option %}selected{% endif %}>{{ option|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                    <label class="form-label">Body part</label>
+                    <select class="form-select" name="body_part">
+                        <option value="">All Body Parts</option>
+                        {% for option in body_parts %}
+                        <option value="{{ option }}" {% if selected_body_part == option %}selected{% endif %}>{{ option|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                    <label class="form-label">Equipment</label>
+                    <select class="form-select" name="equipment">
+                        <option value="">All Equipment</option>
+                        {% for option in equipments %}
+                        <option value="{{ option }}" {% if selected_equipment == option %}selected{% endif %}>{{ option|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-sm-6 col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    <a href="/workouts" class="btn btn-outline-secondary w-100">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     {% if not routines %}
     <div class="row mb-4">
         <div class="col-12">
