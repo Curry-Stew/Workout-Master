@@ -38,10 +38,15 @@ def initialize():
         csv_reader = csv.DictReader(file)
         
         with get_cli_session() as db:
-            bob = UserBase(username='bob', email='bob@mail.com', password=encrypt_password("bobpass"), role='admin')
+            bob = UserBase(username='bob', email='bob@mail.com', password=encrypt_password("bobpass"), role='user')
             bob_db = User.model_validate(bob)
 
             db.add(bob_db)
+
+            admin = UserBase(username='admin', email='admin@mail.com', password=encrypt_password("adminpass"), role='admin')
+            admin_db = User.model_validate(admin)
+            db.add(admin_db)
+
             db.commit()
 
             inserted_titles = set()
