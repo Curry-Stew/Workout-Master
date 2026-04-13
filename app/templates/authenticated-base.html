@@ -96,6 +96,14 @@
                     AI Assistant
                 </a>
             </li>
+            {% if user.role == 'admin' %}
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center {{ 'active' if request.path.startswith('/admin') }}" href="/admin">
+                    <span class="material-symbols-outlined me-2">admin_panel_settings</span>
+                    Admin Dashboard
+                </a>
+            </li>
+            {% endif %}
             <li class="nav-item mt-auto">
                 <a class="nav-link d-flex align-items-center text-danger" href="/logout">
                     <span class="material-symbols-outlined me-2">logout</span>
