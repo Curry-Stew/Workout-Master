@@ -1,6 +1,7 @@
 from sqlmodel import Field, SQLModel
 from typing import Optional
 from pydantic import EmailStr
+from sqlalchemy import Column, Integer
 
 
 class UserBase(SQLModel,):
@@ -10,7 +11,10 @@ class UserBase(SQLModel,):
     role:str = ""
 
 class User(UserBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: Optional[int] = Field(
+        default=None,
+        sa_column=Column(Integer, primary_key=True, autoincrement=True)
+    )
 
 
     
