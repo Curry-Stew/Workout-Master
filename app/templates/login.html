@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Register{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block internal_css %}
 <style>
@@ -158,7 +158,30 @@
         background: #e5e7eb;
     }
 
- 
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (min-width: 576px) {
+        body {
+            padding: 24px;
+        }
+
+        .form-card {
+            padding: 2rem;
+        }
+
+        .form-title {
+            font-size: 1.55rem;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -170,38 +193,34 @@
         </div>
         <span class="brand-text">Workout Master</span>
     </div>
-    <p class="subtitle">Create your account to start planning routines and tracking your progress.</p>
+    <p class="subtitle">Sign in to continue to your routines, workout library, and assistant.</p>
 
     <div class="form-card">
         <h2 class="form-title">
-            <span class="material-symbols-outlined">person_add</span>
-            Register
+            <span class="material-symbols-outlined">login</span>
+            Sign In
         </h2>
-        <form id="signUpForm" method="POST" class="mb-3">
+        <form id="loginForm" method="POST" class="mb-3">
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" required>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Create a password" required>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
             </div>
             <div class="d-grid">
                 <button type="submit" class="btn btn-main text-white">
-                    <span class="material-symbols-outlined me-1" style="font-size: 18px;">how_to_reg</span>
-                    Create Account
+                    <span class="material-symbols-outlined me-1" style="font-size: 18px;">arrow_forward</span>
+                    Log In
                 </button>
             </div>
         </form>
         <div class="divider">or</div>
         <div class="d-grid">
-            <a class="btn btn-outline-dark btn-alt" href="{{ url_for('login_view') }}">
-                <span class="material-symbols-outlined me-1" style="font-size: 18px;">arrow_back</span>
-                Back to Login
+            <a class="btn btn-outline-dark btn-alt" href="{{ url_for('register_view') }}">
+                <span class="material-symbols-outlined me-1" style="font-size: 18px;">person_add</span>
+                Create Account
             </a>
         </div>
 
