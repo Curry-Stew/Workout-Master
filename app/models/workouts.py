@@ -1,5 +1,6 @@
 from sqlmodel import Field, SQLModel
 from typing import Optional
+from sqlalchemy import Column, Integer
 
 class WorkoutBase(SQLModel):
     title: str = Field(index=True, unique=True)  # Maps to 'Title' column
@@ -12,6 +13,9 @@ class WorkoutBase(SQLModel):
     rating_desc: str = Field(nullable=True, default=None)  # Maps to 'RatingDesc' column
 
 class Workout(WorkoutBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)   
+    id: Optional[int] = Field(
+        default=None,
+        sa_column=Column(Integer, primary_key=True, autoincrement=True)
+    )   
 
 
