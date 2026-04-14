@@ -1,5 +1,6 @@
 from typing import Optional
 from sqlmodel import Field, SQLModel
+from sqlalchemy import Column, Integer
 
 
 class RoutineBase(SQLModel):
@@ -9,7 +10,10 @@ class RoutineBase(SQLModel):
 
 
 class Routine(RoutineBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: Optional[int] = Field(
+        default=None,
+        sa_column=Column(Integer, primary_key=True, autoincrement=True)
+    )
 
 
 class RoutineWorkoutBase(SQLModel):
@@ -22,4 +26,7 @@ class RoutineWorkoutBase(SQLModel):
 
 
 class RoutineWorkout(RoutineWorkoutBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: Optional[int] = Field(
+        default=None,
+        sa_column=Column(Integer, primary_key=True, autoincrement=True)
+    )
