@@ -5,10 +5,6 @@
 <style>
     @import url("https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700;900&family=Russo+One&display=swap");
 
-    * {
-        -webkit-tap-highlight-color: transparent;
-    }
-
     body {
         margin: 0;
         min-height: 100vh;
@@ -19,203 +15,104 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 16px;
+        padding: 24px;
     }
 
     .auth-shell {
-        width: min(540px, 100%);
-        animation: fadeInUp 0.5s ease-out;
+        width: min(540px, 94vw);
     }
 
     .brand {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.75rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .brand-icon {
-        width: 48px;
-        height: 48px;
-        background: linear-gradient(135deg, #2f87f6, #0d4ea8);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 20px rgba(47, 135, 246, 0.3);
-    }
-
-    .brand-icon img {
-        width: 28px;
-        height: 28px;
-        filter: brightness(0) invert(1);
-    }
-
-    .brand-text {
         font-family: "Russo One", sans-serif;
-        font-size: clamp(1.75rem, 5vw, 2.4rem);
+        font-size: clamp(2rem, 4vw, 2.6rem);
         text-transform: uppercase;
         letter-spacing: 0.03em;
         color: #eef7ff;
+        margin-bottom: 0.35rem;
     }
 
     .subtitle {
         color: #bdd7ef;
-        margin-bottom: 1.25rem;
-        text-align: center;
-        font-size: 0.95rem;
+        margin-bottom: 1.1rem;
     }
 
     .form-card {
-        background: rgba(255, 255, 255, 0.96);
-        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.94);
+        border-radius: 14px;
         color: #0c1b2f;
-        padding: 1.5rem;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 18px;
     }
 
     .form-title {
         font-family: "Russo One", sans-serif;
-        font-size: 1.4rem;
-        margin-bottom: 1rem;
+        font-size: 1.55rem;
+        margin-bottom: 10px;
         text-transform: uppercase;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .form-title .material-symbols-outlined {
-        color: #2f87f6;
     }
 
     .form-label {
         font-weight: 700;
-        font-size: 0.8rem;
+        font-size: 0.82rem;
         letter-spacing: 0.04em;
         text-transform: uppercase;
-        color: #374151;
     }
 
     .form-control {
         border-radius: 10px;
-        min-height: 48px;
-        border: 1px solid #d1d5db;
-        font-size: 1rem;
-        transition: all 0.2s ease;
-    }
-
-    .form-control:focus {
-        border-color: #2f87f6;
-        box-shadow: 0 0 0 0.2rem rgba(47, 135, 246, 0.2);
+        min-height: 42px;
+        border: 1px solid #c2d5ec;
     }
 
     .btn-main {
         border: none;
         border-radius: 10px;
-        min-height: 48px;
+        min-height: 44px;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         background: linear-gradient(125deg, #0c50a8, #2f87f6);
-        transition: all 0.2s ease;
-    }
-
-    .btn-main:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(47, 135, 246, 0.4);
     }
 
     .btn-alt {
         border-radius: 10px;
-        min-height: 48px;
+        min-height: 42px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        transition: all 0.2s ease;
     }
-
-    .btn-alt:hover {
-        transform: translateY(-2px);
-    }
-
-    .divider {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin: 1rem 0;
-        color: #9ca3af;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-    }
-
-    .divider::before,
-    .divider::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background: #e5e7eb;
-    }
-
-   
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="auth-shell">
-    <div class="brand">
-        <div class="brand-icon">
-            <img src="{{ url_for('static', path='img/favicon.svg') }}" alt="Logo">
-        </div>
-        <span class="brand-text">Workout Master</span>
-    </div>
+    <div class="brand">Workout Master</div>
     <p class="subtitle">Create your account to start planning routines and tracking your progress.</p>
 
     <div class="form-card">
-        <h2 class="form-title">
-            <span class="material-symbols-outlined">person_add</span>
-            Register
-        </h2>
+        <h2 class="form-title">Register</h2>
         <form id="signUpForm" method="POST" class="mb-3">
-            <div class="mb-3">
+            <div class="mb-2">
                 <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" required>
+                <input type="text" class="form-control" id="username" name="username" required>
             </div>
-            <div class="mb-3">
+            <div class="mb-2">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                <input type="email" class="form-control" id="email" name="email" required>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Create a password" required>
+                <input type="password" class="form-control" id="password" name="password" required>
             </div>
             <div class="d-grid">
-                <button type="submit" class="btn btn-main text-white">
-                    <span class="material-symbols-outlined me-1" style="font-size: 18px;">how_to_reg</span>
-                    Create Account
-                </button>
+                <button type="submit" class="btn btn-main text-white">Create Account</button>
             </div>
         </form>
-        <div class="divider">or</div>
         <div class="d-grid">
-            <a class="btn btn-outline-dark btn-alt" href="{{ url_for('login_view') }}">
-                <span class="material-symbols-outlined me-1" style="font-size: 18px;">arrow_back</span>
-                Back to Login
-            </a>
+            <a class="btn btn-outline-dark btn-alt" href="{{ url_for('login_view') }}">Back to Login</a>
         </div>
 
         {% for message in get_flashed_messages(request) %}
-        <div class="alert alert-{{ message.type }} mt-3 mb-0 d-flex align-items-center gap-2" role="alert">
-            {% if message.type == 'success' %}
-            <span class="material-symbols-outlined">check_circle</span>
-            {% elif message.type == 'danger' %}
-            <span class="material-symbols-outlined">error</span>
-            {% else %}
-            <span class="material-symbols-outlined">info</span>
-            {% endif %}
-            {{ message.message }}
-        </div>
+        <div class="alert alert-{{ message.type }} mt-3 mb-0" role="alert">{{ message.message }}</div>
         {% endfor %}
     </div>
 </div>
