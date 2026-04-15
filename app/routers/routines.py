@@ -173,8 +173,7 @@ async def routine_detail_view(
         available_query = available_query.where(Workout.body_part == body_part)
     if equipment:
         available_query = available_query.where(Workout.equipment == equipment)
-    if level:
-        available_query = available_query.where(Workout.level == level)
+   
 
     available_workouts = db.exec(available_query.order_by(Workout.title)).all()
 
@@ -191,8 +190,7 @@ async def routine_detail_view(
     types = _normalize_distinct_values(db.exec(select(Workout.type).distinct().order_by(Workout.type)).all())
     body_parts = _normalize_distinct_values(db.exec(select(Workout.body_part).distinct().order_by(Workout.body_part)).all())
     equipments = _normalize_distinct_values(db.exec(select(Workout.equipment).distinct().order_by(Workout.equipment)).all())
-    levels = _normalize_distinct_values(db.exec(select(Workout.level).distinct().order_by(Workout.level)).all())
-
+   
     return templates.TemplateResponse(
         request=request,
         name="routine_detail.html",
@@ -205,7 +203,6 @@ async def routine_detail_view(
             "types": types,
             "body_parts": body_parts,
             "equipments": equipments,
-            "levels": levels,
             "selected_workout_type": workout_type,
             "selected_body_part": body_part,
             "selected_equipment": equipment,
