@@ -10,6 +10,18 @@ from app.utilities.flash import flash
 from . import router, templates
 
 
+def _normalize_distinct_values(rows):
+    values = []
+    for row in rows:
+        if isinstance(row, tuple):
+            value = row[0]
+        else:
+            value = row
+        if value:
+            values.append(value)
+    return values
+
+
 @router.get("/routines", response_class=HTMLResponse)
 async def routines_view(request: Request, user: AuthDep, db: SessionDep):
     routines = db.exec(select(Routine).where(Routine.user_id == user.id)).all()
@@ -138,6 +150,7 @@ async def routine_detail_view(
     workout_type: Optional[str] = None,
     body_part: Optional[str] = None,
     equipment: Optional[str] = None,
+    level: Optional[str] = None,
 ):
     routine = db.get(Routine, routine_id)
     if not routine or routine.user_id != user.id:
@@ -160,6 +173,8 @@ async def routine_detail_view(
         available_query = available_query.where(Workout.body_part == body_part)
     if equipment:
         available_query = available_query.where(Workout.equipment == equipment)
+    if level:
+        available_query = available_query.where(Workout.level == level)
 
     available_workouts = db.exec(available_query.order_by(Workout.title)).all()
 
@@ -173,9 +188,10 @@ async def routine_detail_view(
             alternative_query = alternative_query.where(Workout.id.notin_(existing_workout_ids))
         alternative_workouts[association.id] = db.exec(alternative_query).all()
 
-    types = [row[0] for row in db.exec(select(Workout.type).distinct().order_by(Workout.type)).all()]
-    body_parts = [row[0] for row in db.exec(select(Workout.body_part).distinct().order_by(Workout.body_part)).all()]
-    equipments = [row[0] for row in db.exec(select(Workout.equipment).distinct().order_by(Workout.equipment)).all()]
+    types = _normalize_distinct_values(db.exec(select(Workout.type).distinct().order_by(Workout.type)).all())
+    body_parts = _normalize_distinct_values(db.exec(select(Workout.body_part).distinct().order_by(Workout.body_part)).all())
+    equipments = _normalize_distinct_values(db.exec(select(Workout.equipment).distinct().order_by(Workout.equipment)).all())
+    levels = _normalize_distinct_values(db.exec(select(Workout.level).distinct().order_by(Workout.level)).all())
 
     return templates.TemplateResponse(
         request=request,
@@ -189,9 +205,11 @@ async def routine_detail_view(
             "types": types,
             "body_parts": body_parts,
             "equipments": equipments,
+            "levels": levels,
             "selected_workout_type": workout_type,
             "selected_body_part": body_part,
             "selected_equipment": equipment,
+            "selected_level": level,
         },
     )
 
