@@ -60,15 +60,7 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="col-sm-6 col-md-4">
-                            <label class="form-label">Level</label>
-                            <select class="form-select" name="level">
-                                <option value="">All Levels</option>
-                                {% for option in levels %}
-                                <option value="{{ option }}" {% if selected_level == option %}selected{% endif %}>{{ option|title }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                      
                         <div class="col-md-2 d-grid">
                             <button type="submit" class="btn btn-outline-primary">Filter</button>
                         </div>
